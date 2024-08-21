@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.emanuelcosta.enrollment.entities.Department;
+import br.com.emanuelcosta.enrollment.entities.Instructor;
 import br.com.emanuelcosta.enrollment.services.DepartmentService;
 
 
@@ -46,6 +47,17 @@ public class DepartmentResource {
 		Department obj = departimentService.findById(id);
 		return ResponseEntity.ok().body(obj);
 	}
+	
+	@GetMapping(value = "/instructors/department/{departmentId}")
+	public ResponseEntity<List<Instructor>> findAllInstructorsByDepartmentId (@PathVariable Long departmentId) {
+		List<Instructor> list = departimentService.findAllInstructorsByDepartmentId(departmentId);
+		
+		return ResponseEntity.ok().body(list);
+		
+	}
+	
+	
+	
 	
 	@PostMapping
 	public ResponseEntity<Department> insert(@RequestBody Department obj){

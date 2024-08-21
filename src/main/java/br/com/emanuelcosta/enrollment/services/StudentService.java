@@ -1,7 +1,9 @@
 package br.com.emanuelcosta.enrollment.services;
 
+
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +17,7 @@ import br.com.emanuelcosta.enrollment.repositories.StudentRepository;
 import br.com.emanuelcosta.enrollment.services.exceptions.DatabaseException;
 import br.com.emanuelcosta.enrollment.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
+
 
 @Service
 public class StudentService {
@@ -31,6 +34,13 @@ public class StudentService {
 		
 	}
 	
+	public Set<Course> findCoursesByStudentId(Long id) {
+		
+		
+		return  studentRepository.findCoursesByStudentId(id) ;
+		
+	}
+	
 	public Student findById(Long id) {
 		Optional<Student> obj = studentRepository.findById(id);
 		
@@ -40,31 +50,102 @@ public class StudentService {
 	}
 	
 	
-	
-	
-	 public Student createStudent(Long courseId, Student student) {
+	 public Student insert(Student obj) {
+	        
+	        return studentRepository.save(obj);
+	    }
+	 
+		// subscribe  the student in the course
+	 public Student subscribeStudent(Long courseId, Student obj) {
 	    	
 	    	
 	    	try {
 	    		
 	    		Course courseEntity = courseRepository.findById(courseId).get();
 	    		
-	    		student.addCourse(courseEntity);
+	    		
+	    		
+	    		courseEntity.addStudent(obj);
+	    		
+	    		
+	    		
+	    	return	studentRepository.save(obj);
+	    		
+	           
 	    	
 				
-				return studentRepository.save(student);
+				
 				
 			} catch (EntityNotFoundException e) {
 				throw new ResourceNotFoundException(courseId);
 			}	
 	    		
 		}
+	 
+	 
+	 public Student unsubscribeStudent(Long courseId, Student obj) {
+	    	
+	    	
+	    	try {
+	    		
+	    		Course courseEntity = courseRepository.findById(courseId).get();
+	    	
+	    		
+	    		
+	    		
+	           		
+	    		studentRepository.deleteStudentCourse(obj.getId(), courseEntity.getId());
+	    		
+	    		
+	    		
+	    	return	studentRepository.save(obj);
+	    		
+	    		
+	    		  
+	    	         
+				
+			} catch (EntityNotFoundException e) {
+				throw new ResourceNotFoundException(courseId);
+			}	
+	    		
+		}
+
 	
-	public Student insert(Student obj) {
-		
-	    return studentRepository.save(obj);
-		
-	}
+	
+	
+	 
+	 public Student update(Long studentId,  Student obj) {
+			
+			try {
+				
+				Student entity = studentRepository.getReferenceById(studentId);
+				
+				
+				
+				entity.setName(obj.getName());
+				entity.setEmail(obj.getEmail()); 
+				
+				
+				return studentRepository.save(entity);
+			} catch (EntityNotFoundException e) {
+				throw new ResourceNotFoundException(studentId);
+			}		 
+	 
+	 
+			
+			
+		}
+	 
+	
+
+	 
+	 
+	
+//	public Student insert(Student obj) {
+//		
+//	    return studentRepository.save(obj);
+//		
+//	}
 	
 	public void delete(Long id) {
 		
@@ -80,22 +161,6 @@ public class StudentService {
 			
 		}
 	
-	public Student update(Long id,  Student obj) {
-		
-		try {
-			Student entity = studentRepository.getReferenceById(id);
-			
-			entity.setName(obj.getName());
-			entity.setEmail(obj.getEmail()); 
-			
-			
-			return studentRepository.save(entity);
-		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException(id);
-		}	
-		
-		
-	}
 	
 
 }

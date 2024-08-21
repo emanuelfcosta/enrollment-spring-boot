@@ -2,6 +2,7 @@ package br.com.emanuelcosta.enrollment.resources;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.emanuelcosta.enrollment.entities.Course;
+import br.com.emanuelcosta.enrollment.entities.Instructor;
+import br.com.emanuelcosta.enrollment.entities.Student;
 import br.com.emanuelcosta.enrollment.services.CourseService;
 
 
@@ -41,6 +44,12 @@ public class CourseResource {
 		
 	}
 	
+	@GetMapping(value = "/students/course/{courseId}")
+	public ResponseEntity<Set<Student>> findStudentsByCourseId(@PathVariable Long courseId) {
+		Set<Student> list = courseService.findStudentsByCourseId(courseId);
+		return ResponseEntity.ok().body(list);
+	}
+	
 
 	
 	@GetMapping(value = "/{id}")
@@ -49,6 +58,8 @@ public class CourseResource {
 		return ResponseEntity.ok().body(obj);
 	}
 	
+
+	
 	@PostMapping
 	public ResponseEntity<Course> insert( @RequestBody Course obj){
 		
@@ -56,13 +67,10 @@ public class CourseResource {
 		obj = courseService.insert(obj);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);
-		
-		
-		
+						
 	}
 	
 
-	
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete (@PathVariable Long id){
 		
@@ -78,5 +86,5 @@ public class CourseResource {
 		obj = courseService.update(id, obj);
 		return ResponseEntity.ok().body(obj);
 	}
-
+	
 }

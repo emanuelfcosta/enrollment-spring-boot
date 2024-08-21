@@ -63,7 +63,7 @@ public class InstructorService {
 		
 	}
 	
-	
+	// to create the instructor you need the department and the course
     public Instructor createInstructor(Long departmentId, Long courseId, Instructor instructor) {
     	
     	
@@ -84,13 +84,40 @@ public class InstructorService {
 		}	
     		
 	}
-	
-	
-	public Instructor insert(Instructor obj) {
+    
+ // to update the instructor you need the department and the course
+    public Instructor updateInstructor(Long id,Long departmentId, Long courseId,  Instructor obj) {
 		
-	    return instructorRepository.save(obj);
+		try {
+			
+			Department departmentEntity = departmentRepository.findById(departmentId).get();
+    		
+			Course courseEntity = courseRepository.findById(courseId).get();
+			
+			Instructor entity = instructorRepository.getReferenceById(id);
+			
+			entity.setDepartment(departmentEntity);
+			
+			entity.setCourse(courseEntity);
+			
+			entity.setName(obj.getName());
+			entity.setEmail(obj.getEmail()); 
+			
+			
+			return instructorRepository.save(entity);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}	
+		
 		
 	}
+	
+	
+//	public Instructor insert(Instructor obj) {
+//		
+//	    return instructorRepository.save(obj);
+//		
+//	}
 	
 	public void delete(Long id) {
 			
@@ -104,22 +131,22 @@ public class InstructorService {
 			
 		}
 	
-	public Instructor update(Long id,  Instructor obj) {
-		
-		try {
-			Instructor entity = instructorRepository.getReferenceById(id);
-			
-			entity.setName(obj.getName());
-			entity.setEmail(obj.getEmail()); 
-			
-			
-			return instructorRepository.save(entity);
-		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException(id);
-		}	
-		
-		
-	}
+//	public Instructor update(Long id,  Instructor obj) {
+//		
+//		try {
+//			Instructor entity = instructorRepository.getReferenceById(id);
+//			
+//			entity.setName(obj.getName());
+//			entity.setEmail(obj.getEmail()); 
+//			
+//			
+//			return instructorRepository.save(entity);
+//		} catch (EntityNotFoundException e) {
+//			throw new ResourceNotFoundException(id);
+//		}	
+//		
+//		
+//	}
 
 }
 

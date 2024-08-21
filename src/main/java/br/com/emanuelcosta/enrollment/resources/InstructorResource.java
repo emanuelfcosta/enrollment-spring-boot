@@ -68,14 +68,19 @@ public class InstructorResource {
 		return ResponseEntity.created(uri).body(obj);
 	}
 	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<Instructor> update(@PathVariable Long id, @RequestBody Instructor obj){
+	
+	@PutMapping(value = "/instructors/{instructorId}/departments/{departmentId}/courses/{courseId}")
+	public ResponseEntity<Instructor> update(@PathVariable Long instructorId,
+			@PathVariable Long departmentId, @PathVariable Long courseId, 
+			@RequestBody Instructor obj){
 		
-		obj = instructorService.update(id, obj);
+		obj = instructorService.updateInstructor(instructorId,departmentId,courseId, obj);
 		return ResponseEntity.ok().body(obj);
 		
 
 	}
+	
+
 	
 	
 	@DeleteMapping(value = "/{id}")

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -28,6 +31,7 @@ public class Department implements Serializable {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "department")
+	
 	private List<Instructor> instructors = new ArrayList<>();
 	
 	

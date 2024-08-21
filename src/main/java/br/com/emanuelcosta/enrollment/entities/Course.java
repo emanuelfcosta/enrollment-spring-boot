@@ -2,7 +2,9 @@ package br.com.emanuelcosta.enrollment.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -10,12 +12,18 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,9 +37,26 @@ public class Course implements Serializable {
 	private Long id;
 	private String name;
 	
+		
+	@JsonIgnore   
+	@ManyToMany(  
+			fetch = FetchType.LAZY
+	,
+	 cascade = { 
+			 
+		 	
+			CascadeType.MERGE,
+			CascadeType.DETACH,
+			CascadeType.REFRESH 
+			}
 	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "courses")
+			)
+	
+	@JoinTable(name = "tb_student_course", joinColumns = @JoinColumn(name = "course_id"),
+	inverseJoinColumns = @JoinColumn(name = "student_id") )
+	
+	
+	
 	private Set<Student> students = new HashSet<>();
 	
 	
@@ -45,12 +70,12 @@ public class Course implements Serializable {
 	}
 		
 
-	public Course(Long id, String name, Set<Student> students, List<Instructor> instructors) {
+	
+	public Course(Long id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.students = students;
-		this.instructors = instructors;
+
 	}
 
 
@@ -76,7 +101,8 @@ public class Course implements Serializable {
 	
 
 	public Set<Student> getStudents() {
-		return students;
+	//	return students;
+		return Collections.unmodifiableSet(students);
 	}
 
 	public void setStudents(Set<Student> students) {
@@ -86,6 +112,7 @@ public class Course implements Serializable {
 
 	public List<Instructor> getInstructors() {
 		return instructors;
+		
 	}
 
 	public void setInstructors(List<Instructor> instructors) {
@@ -96,17 +123,26 @@ public class Course implements Serializable {
 
 
 	public void addStudent(Student theStudent) {
-			
-			
-			students.add(theStudent);
+		
+		
+		students.add(theStudent);
 			
 		}
 	
-	 public void removeStudent(Student theStudent) {
-		    this.students.remove(theStudent);
-		    theStudent.getCourses().remove(this);
+	
+	 
+	
+	public void removeStudent(Student theStudent) {
+		
+	
+		students.remove(theStudent);
+		 
+		 
+		
 	        
 	    }
+	 
+	 
 
 
 

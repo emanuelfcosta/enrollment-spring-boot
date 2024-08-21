@@ -1,18 +1,23 @@
 package br.com.emanuelcosta.enrollment.entities;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,8 +32,17 @@ public class Student implements Serializable {
 	private String name;
 	private String email;
 	
-	@ManyToMany
-	@JoinTable(name = "tb_student_course",
+	
+	
+	@ManyToMany( 
+		 cascade = {
+					
+			CascadeType.MERGE,
+			CascadeType.DETACH,
+			CascadeType.REFRESH 
+			}
+)
+	@JoinTable(name = "tb_student_course", 
 	joinColumns = @JoinColumn(name="student_id"),
 	inverseJoinColumns = @JoinColumn(name="course_id"))
 	private Set<Course> courses = new HashSet<>();
@@ -70,7 +84,9 @@ public class Student implements Serializable {
 	}
 
 	public Set<Course> getCourses() {
-		return courses;
+		//return courses;
+		//force clients through our add and remove methods
+		return Collections.unmodifiableSet(courses);
 	}
 	
 	 public void setCourses(Set<Course> course) {
@@ -78,16 +94,20 @@ public class Student implements Serializable {
 	}
 	 
 		public void addCourse(Course theCourse) {
+			
+			courses.add(theCourse);
 		
-		if (courses == null) {
-			courses = new HashSet<>();
-		}
-		
-		courses.add(theCourse);
 		
 	}  
-		
 	
+		public void removeCourse(Course theCourse) {
+			
+			courses.remove(theCourse);
+	
+		
+		
+	}		
+	 
  	
 	@Override
 	public int hashCode() {

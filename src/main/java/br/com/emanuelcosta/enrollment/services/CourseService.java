@@ -2,6 +2,7 @@ package br.com.emanuelcosta.enrollment.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -9,13 +10,16 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import br.com.emanuelcosta.enrollment.entities.Course;
+import br.com.emanuelcosta.enrollment.entities.Department;
 import br.com.emanuelcosta.enrollment.entities.Instructor;
+import br.com.emanuelcosta.enrollment.entities.Student;
 import br.com.emanuelcosta.enrollment.repositories.CourseRepository;
 import br.com.emanuelcosta.enrollment.repositories.InstructorRepository;
 import br.com.emanuelcosta.enrollment.repositories.StudentRepository;
 import br.com.emanuelcosta.enrollment.services.exceptions.DatabaseException;
 import br.com.emanuelcosta.enrollment.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class CourseService {
@@ -35,11 +39,25 @@ public class CourseService {
 		
 	}
 	
+	public Set<Student> findStudentsByCourseId(Long id) {
+		
+	
+		return  courseRepository.findStudentsByCourseId(id);
+		
+	}
+	
+	
 	public Course findById(Long id) {
 		Optional<Course> obj = courseRepository.findById(id);
 		
 		return obj.get();
 	}
+	
+	
+
+	
+
+
 	
 	public Course createCourse(Long instructorId, Course course) {
     	
@@ -47,6 +65,7 @@ public class CourseService {
     	try {
     		
     		Instructor instructorEntity = instructorRepository.findById(instructorId).get();
+    		
     		
     		
 			return courseRepository.save(course);
@@ -70,6 +89,18 @@ public class CourseService {
 	
 			
 			try {
+				
+				Course obj = courseRepository.findById(id).get();
+				
+				   //before deleting we set the instructors as null
+					
+					for (Instructor instructor : obj.getInstructors() ) {
+						instructor.setCourse(null);
+					  
+					}
+				
+				
+				
 	
 				courseRepository.deleteById(id);
 			} catch (EmptyResultDataAccessException e) {
@@ -95,6 +126,8 @@ public class CourseService {
 		
 		
 	}
+	
+
 
 }
 
